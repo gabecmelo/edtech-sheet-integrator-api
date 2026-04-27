@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>EdTech.SheetIntegrator.Api</RootNamespace>
+    <AssemblyName>EdTech.SheetIntegrator.Api</AssemblyName>
+    <UserSecretsId>edtech-sheet-integrator-api</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EdTech.SheetIntegrator.Infrastructure\EdTech.SheetIntegrator.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

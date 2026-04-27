@@ -1,0 +1,48 @@
+## .NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+.vscode/
+*.swp
+*.swo
+*.tmp
+*.log
+
+## Build outputs
+[Dd]ebug/
+[Rr]elease/
+[Pp]ublish/
+TestResults/
+artifacts/
+coverage/
+*.coverage
+*.coveragexml
+coverage.json
+coverage.cobertura.xml
+coverage.opencover.xml
+
+## Stryker
+StrykerOutput/
+
+## Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+## Claude Code
+.claude/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Secrets
+*.pfx
+*.snk
+appsettings.*.local.json
+.env
+.env.*
+!.env.example

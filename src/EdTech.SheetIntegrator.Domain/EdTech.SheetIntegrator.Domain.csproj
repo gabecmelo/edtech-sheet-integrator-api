@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>EdTech.SheetIntegrator.Domain</RootNamespace>
+    <AssemblyName>EdTech.SheetIntegrator.Domain</AssemblyName>
+  </PropertyGroup>
+
+</Project>
