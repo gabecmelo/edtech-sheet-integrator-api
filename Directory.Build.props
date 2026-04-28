@@ -28,6 +28,12 @@
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('Tests'))">
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <!--
+      Suppressed analyzer rules in test projects:
+      - CA1707: underscores in member names (xUnit's standard "Method_Reads_Like_This" convention).
+      - CA1861: prefer constant arrays over inline ones (defeats the readability of [Theory]-style data).
+    -->
+    <NoWarn>$(NoWarn);CA1707;CA1861</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
