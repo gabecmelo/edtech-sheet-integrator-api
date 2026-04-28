@@ -23,6 +23,13 @@
   <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
+    <!--
+      Globally suppressed analyzer rules in production code:
+      - CA1848: prefer LoggerMessage source generators. A perf rule for hot-path logging at very
+        high volume. For an HTTP API whose logs run at request rate, the readability of standard
+        ILogger extensions outweighs the marginal allocation savings. Reconsidered if log volume grows.
+    -->
+    <NoWarn>$(NoWarn);CA1848</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('Tests'))">
