@@ -1,0 +1,112 @@
+### EdTech Sheet-Integrator API — manual smoke test
+### Open in VS Code (REST Client extension) or Rider HTTP Client.
+### Variables flow top-to-bottom: run requests in order.
+
+@host = http://localhost:5000
+
+### 1. Liveness — should return 200 with no body
+GET {{host}}/health/live
+
+### 2. Readiness — depends on SQL Server reachability
+GET {{host}}/health/ready
+
+### 3. Mint a dev Instructor JWT (Development env only)
+# @name devToken
+POST {{host}}/dev/token
+Content-Type: application/json
+
+{
+  "subject": "gabe@local"
+}
+
+### Capture token from previous response
+@token = {{devToken.response.body.token}}
+
+### 4. Create an assessment (requires Instructor token)
+# @name createdAssessment
+POST {{host}}/api/v1/assessments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Geography & math quiz",
+  "questions": [
+    {
+      "questionId": "Q1",
+      "prompt": "Capital of France?",
+      "correctAnswer": "Paris",
+      "points": 1,
+      "matchMode": "exact",
+      "numericTolerance": null
+    },
+    {
+      "questionId": "Q2",
+      "prompt": "Pi to two decimals?",
+      "correctAnswer": "3.14",
+      "points": 5,
+      "matchMode": "numeric",
+      "numericTolerance": 0.01
+    }
+  ]
+}
+
+@assessmentId = {{createdAssessment.response.body.id}}
+
+### 5. Read the assessment back (open endpoint)
+GET {{host}}/api/v1/assessments/{{assessmentId}}
+
+### 6. Upload a CSV submission and grade it
+###    Save the body below as alice.csv first, then this request streams it.
+###    CSV body (header + 2 rows):
+###       QuestionId,Response
+###       Q1,Paris
+###       Q2,3.14
+# @name gradedSubmission
+POST {{host}}/api/v1/assessments/{{assessmentId}}/submissions
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----test-boundary
+
+------test-boundary
+Content-Disposition: form-data; name="studentIdentifier"
+
+alice@example.com
+------test-boundary
+Content-Disposition: form-data; name="file"; filename="alice.csv"
+Content-Type: text/csv
+
+QuestionId,Response
+Q1,Paris
+Q2,3.14
+------test-boundary--
+
+@submissionId = {{gradedSubmission.response.body.id}}
+
+### 7. Fetch the persisted graded submission
+GET {{host}}/api/v1/submissions/{{submissionId}}
+
+### 8. List submissions for the assessment (paged, newest first)
+GET {{host}}/api/v1/assessments/{{assessmentId}}/submissions?page=1&pageSize=20
+
+### 9. Negative path — bad token returns 401
+GET {{host}}/api/v1/assessments/{{assessmentId}}
+# (Open endpoint — should still succeed. The 401 negative case is the POST below.)
+
+### 10. Negative path — missing assessment returns 404 ProblemDetails
+GET {{host}}/api/v1/assessments/00000000-0000-0000-0000-000000000000
+
+### 11. Negative path — unsupported file type returns 415
+###     (.txt extension is rejected by the parser factory.)
+POST {{host}}/api/v1/assessments/{{assessmentId}}/submissions
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----test-boundary
+
+------test-boundary
+Content-Disposition: form-data; name="studentIdentifier"
+
+alice@example.com
+------test-boundary
+Content-Disposition: form-data; name="file"; filename="alice.txt"
+Content-Type: text/plain
+
+unrelated content
+------test-boundary--
