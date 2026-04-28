@@ -8,13 +8,18 @@ namespace EdTech.SheetIntegrator.Domain.Grading;
 /// </summary>
 public sealed record QuestionOutcome
 {
-    public string QuestionId { get; }
+    public string QuestionId { get; init; } = null!;
 
-    public bool IsCorrect { get; }
+    public bool IsCorrect { get; init; }
 
-    public decimal EarnedPoints { get; }
+    public decimal EarnedPoints { get; init; }
 
-    public decimal MaxPoints { get; }
+    public decimal MaxPoints { get; init; }
+
+    // For System.Text.Json hydration; trusts persisted data.
+    private QuestionOutcome()
+    {
+    }
 
     public QuestionOutcome(string questionId, bool isCorrect, decimal earnedPoints, decimal maxPoints)
     {

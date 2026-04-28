@@ -8,11 +8,16 @@ namespace EdTech.SheetIntegrator.Domain.Grading;
 /// </summary>
 public sealed record GradingResult
 {
-    public Score Score { get; }
+    public Score Score { get; init; }
 
-    public IReadOnlyList<QuestionOutcome> Outcomes { get; }
+    public IReadOnlyList<QuestionOutcome> Outcomes { get; init; } = [];
 
-    public DateTimeOffset GradedAt { get; }
+    public DateTimeOffset GradedAt { get; init; }
+
+    // For System.Text.Json hydration; trusts persisted data.
+    private GradingResult()
+    {
+    }
 
     public GradingResult(Score score, IReadOnlyList<QuestionOutcome> outcomes, DateTimeOffset gradedAt)
     {

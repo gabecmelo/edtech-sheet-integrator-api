@@ -10,17 +10,22 @@ namespace EdTech.SheetIntegrator.Domain.Assessments;
 /// </summary>
 public sealed record Question
 {
-    public string QuestionId { get; }
+    public string QuestionId { get; init; } = null!;
 
-    public string Prompt { get; }
+    public string Prompt { get; init; } = null!;
 
-    public string CorrectAnswer { get; }
+    public string CorrectAnswer { get; init; } = null!;
 
-    public decimal Points { get; }
+    public decimal Points { get; init; }
 
-    public MatchMode MatchMode { get; }
+    public MatchMode MatchMode { get; init; }
 
-    public decimal? NumericTolerance { get; }
+    public decimal? NumericTolerance { get; init; }
+
+    // For EF Core / System.Text.Json hydration; trusts that previously persisted data was valid.
+    private Question()
+    {
+    }
 
     public Question(
         string questionId,

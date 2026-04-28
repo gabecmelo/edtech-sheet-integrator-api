@@ -8,9 +8,14 @@ namespace EdTech.SheetIntegrator.Domain.Submissions;
 /// </summary>
 public sealed record Answer
 {
-    public string QuestionId { get; }
+    public string QuestionId { get; init; } = null!;
 
-    public string Response { get; }
+    public string Response { get; init; } = null!;
+
+    // For EF Core / System.Text.Json hydration; trusts persisted data.
+    private Answer()
+    {
+    }
 
     public Answer(string questionId, string response)
     {
