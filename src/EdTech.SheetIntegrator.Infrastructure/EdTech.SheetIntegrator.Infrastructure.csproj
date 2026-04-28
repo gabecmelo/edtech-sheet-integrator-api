@@ -24,4 +24,8 @@
     <PackageReference Include="CsvHelper" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="EdTech.SheetIntegrator.Infrastructure.IntegrationTests" />
+  </ItemGroup>
+
 </Project>
