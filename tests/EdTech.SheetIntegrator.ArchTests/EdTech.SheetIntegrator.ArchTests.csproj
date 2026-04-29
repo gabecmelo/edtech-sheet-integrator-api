@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NetArchTest.Rules" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
+  </ItemGroup>
+
+  <!--
+    References to all four production layers so reflection can reach their assemblies.
+    The test project itself is allowed to depend on everything; the rules under test
+    restrict the production assemblies, not this project.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EdTech.SheetIntegrator.Domain\EdTech.SheetIntegrator.Domain.csproj" />
+    <ProjectReference Include="..\..\src\EdTech.SheetIntegrator.Application\EdTech.SheetIntegrator.Application.csproj" />
+    <ProjectReference Include="..\..\src\EdTech.SheetIntegrator.Infrastructure\EdTech.SheetIntegrator.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\EdTech.SheetIntegrator.Api\EdTech.SheetIntegrator.Api.csproj" />
+  </ItemGroup>
+
+</Project>

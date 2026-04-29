@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdTech.SheetIntegrator.Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdTech.SheetIntegrator.Api.IntegrationTests", "tests\EdTech.SheetIntegrator.Api.IntegrationTests\EdTech.SheetIntegrator.Api.IntegrationTests.csproj", "{7452691F-6207-4343-9922-4AACA31201B1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdTech.SheetIntegrator.ArchTests", "tests\EdTech.SheetIntegrator.ArchTests\EdTech.SheetIntegrator.ArchTests.csproj", "{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +131,18 @@ Global
 		{7452691F-6207-4343-9922-4AACA31201B1}.Release|x64.Build.0 = Release|Any CPU
 		{7452691F-6207-4343-9922-4AACA31201B1}.Release|x86.ActiveCfg = Release|Any CPU
 		{7452691F-6207-4343-9922-4AACA31201B1}.Release|x86.Build.0 = Release|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Debug|x64.Build.0 = Debug|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Debug|x86.Build.0 = Debug|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Release|x64.ActiveCfg = Release|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Release|x64.Build.0 = Release|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Release|x86.ActiveCfg = Release|Any CPU
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -140,5 +156,6 @@ Global
 		{A6106C13-C5AE-41EB-9ED9-E14471869F23} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{00465DF9-CFB4-4B68-BBBE-1F3BE0BCAF02} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{7452691F-6207-4343-9922-4AACA31201B1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{4B98FC7B-4267-4EEA-8C80-6203A2A34A37} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
