@@ -1,0 +1,13 @@
+{
+  "stryker-config": {
+    "solution": "EdTech.SheetIntegrator.sln",
+    "thresholds": {
+      "high": 85,
+      "low": 75,
+      "break": 70
+    },
+    "mutation-level": "Advanced",
+    "reporters": [ "progress", "html" ],
+    "report-file-name": "mutation-report"
+  }
+}

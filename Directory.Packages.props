@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <!-- Disabled: CentralPackageTransitivePinningEnabled breaks Buildalyzer (used by Stryker.NET) -->
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
 
   <!--
