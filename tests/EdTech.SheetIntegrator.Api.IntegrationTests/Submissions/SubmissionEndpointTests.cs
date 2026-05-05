@@ -15,8 +15,8 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
     private readonly HttpClient _client = factory.CreateApiClient();
 
     // Answers that match the standard two-question key (Q1=Paris exact, Q2=3.14±0.01 numeric).
-    private static readonly (string, string)[] AllCorrect = [("Q1", "Paris"), ("Q2", "3.14")];
-    private static readonly (string, string)[] OnlyQ1Correct = [("Q1", "Paris"), ("Q2", "wrong")];
+    private static readonly (string, string)[] _allCorrect = [("Q1", "Paris"), ("Q2", "3.14")];
+    private static readonly (string, string)[] _onlyQ1Correct = [("Q1", "Paris"), ("Q2", "wrong")];
 
     // ── Authorization ─────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
     {
         using var form = ApiRequestBuilder.BuildSubmissionForm(
             "alice@example.com",
-            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(AllCorrect)));
+            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(_allCorrect)));
 
         var response = await _client.PostAsync(
             $"/api/v1/assessments/{Guid.NewGuid()}/submissions", form);
@@ -45,7 +45,7 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
 
         using var form = ApiRequestBuilder.BuildSubmissionForm(
             "alice@example.com",
-            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(AllCorrect)));
+            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(_allCorrect)));
 
         var response = await _client.PostAsync(
             $"/api/v1/assessments/{assessmentId}/submissions", form);
@@ -71,7 +71,7 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
 
         using var form = ApiRequestBuilder.BuildSubmissionForm(
             "bob@example.com",
-            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(OnlyQ1Correct)));
+            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(_onlyQ1Correct)));
 
         var response = await _client.PostAsync(
             $"/api/v1/assessments/{assessmentId}/submissions", form);
@@ -96,7 +96,7 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
 
         using var form = ApiRequestBuilder.BuildSubmissionForm(
             "charlie@example.com",
-            FileFixtures.AsXlsxContent(FileFixtures.BuildXlsx(AllCorrect)));
+            FileFixtures.AsXlsxContent(FileFixtures.BuildXlsx(_allCorrect)));
 
         var response = await _client.PostAsync(
             $"/api/v1/assessments/{assessmentId}/submissions", form);
@@ -117,7 +117,7 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
         _client.UseInstructorToken(token);
 
         var assessmentId = await ApiRequestBuilder.CreateAssessmentAsync(_client);
-        var submissionId = await ApiRequestBuilder.SubmitCsvAsync(_client, assessmentId, AllCorrect);
+        var submissionId = await ApiRequestBuilder.SubmitCsvAsync(_client, assessmentId, _allCorrect);
 
         // GET is an open endpoint — strip auth header.
         _client.DefaultRequestHeaders.Authorization = null;
@@ -152,8 +152,8 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
         var assessmentId = await ApiRequestBuilder.CreateAssessmentAsync(_client);
 
         // Submit two different students.
-        await ApiRequestBuilder.SubmitCsvAsync(_client, assessmentId, AllCorrect, "student-a@x.com");
-        await ApiRequestBuilder.SubmitCsvAsync(_client, assessmentId, OnlyQ1Correct, "student-b@x.com");
+        await ApiRequestBuilder.SubmitCsvAsync(_client, assessmentId, _allCorrect, "student-a@x.com");
+        await ApiRequestBuilder.SubmitCsvAsync(_client, assessmentId, _onlyQ1Correct, "student-b@x.com");
 
         var response = await _client.GetAsync(
             $"/api/v1/assessments/{assessmentId}/submissions?page=1&pageSize=10");
@@ -180,7 +180,7 @@ public sealed class SubmissionEndpointTests(ApiFactory factory)
 
         using var form = ApiRequestBuilder.BuildSubmissionForm(
             "alice@example.com",
-            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(AllCorrect)));
+            FileFixtures.AsCsvContent(FileFixtures.BuildCsv(_allCorrect)));
 
         var response = await _client.PostAsync(
             $"/api/v1/assessments/{Guid.Empty}/submissions", form);

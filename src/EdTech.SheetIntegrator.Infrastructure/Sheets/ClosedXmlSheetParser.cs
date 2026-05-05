@@ -9,9 +9,9 @@ namespace EdTech.SheetIntegrator.Infrastructure.Sheets;
 /// </summary>
 internal sealed class ClosedXmlSheetParser : ISheetParser
 {
-    private const string XlsxExtension = ".xlsx";
+    private const string _xlsxExtension = ".xlsx";
 
-    private static readonly HashSet<string> XlsxContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> _xlsxContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "application/vnd.ms-excel.sheet.macroenabled.12",
@@ -21,12 +21,12 @@ internal sealed class ClosedXmlSheetParser : ISheetParser
     public bool CanParse(string fileName, string? contentType)
     {
         if (!string.IsNullOrEmpty(fileName) &&
-            Path.GetExtension(fileName).Equals(XlsxExtension, StringComparison.OrdinalIgnoreCase))
+            Path.GetExtension(fileName).Equals(_xlsxExtension, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
 
-        return contentType is not null && XlsxContentTypes.Contains(contentType);
+        return contentType is not null && _xlsxContentTypes.Contains(contentType);
     }
 
     public Task<IReadOnlyList<RawAnswer>> ParseAsync(Stream stream, CancellationToken cancellationToken)

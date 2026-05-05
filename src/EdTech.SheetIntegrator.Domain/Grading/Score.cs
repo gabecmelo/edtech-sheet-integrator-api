@@ -9,7 +9,7 @@ namespace EdTech.SheetIntegrator.Domain.Grading;
 public readonly record struct Score
 {
     public decimal Earned { get; }
-    
+
     public decimal Total { get; }
 
     public Score(decimal earned, decimal total)

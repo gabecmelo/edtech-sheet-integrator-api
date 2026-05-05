@@ -17,10 +17,10 @@ namespace EdTech.SheetIntegrator.ArchTests;
 /// </summary>
 public sealed class StructuralTests
 {
-    private static readonly Assembly DomainAssembly =
+    private static readonly Assembly _domainAssembly =
         typeof(Assessment).Assembly;
 
-    private static readonly Assembly ApplicationAssembly =
+    private static readonly Assembly _applicationAssembly =
         typeof(IApplicationAssemblyMarker).Assembly;
 
     // ── Use-case convention ───────────────────────────────────────────────────
@@ -29,7 +29,7 @@ public sealed class StructuralTests
     public void UseCase_Classes_Reside_In_Application_Assembly()
     {
         // Every type whose name ends with "UseCase" should be in the Application project.
-        var result = Types.InAssembly(ApplicationAssembly)
+        var result = Types.InAssembly(_applicationAssembly)
             .That()
             .HaveNameEndingWith("UseCase")
             .Should()
@@ -44,7 +44,7 @@ public sealed class StructuralTests
     [Fact]
     public void UseCase_Classes_Are_Sealed()
     {
-        var result = Types.InAssembly(ApplicationAssembly)
+        var result = Types.InAssembly(_applicationAssembly)
             .That()
             .HaveNameEndingWith("UseCase")
             .Should()
@@ -63,7 +63,7 @@ public sealed class StructuralTests
     {
         // Every concrete exception class in the Domain assembly (other than DomainException
         // itself) must extend DomainException so callers can catch at the right granularity.
-        var result = Types.InAssembly(DomainAssembly)
+        var result = Types.InAssembly(_domainAssembly)
             .That()
             .AreClasses()
             .And()

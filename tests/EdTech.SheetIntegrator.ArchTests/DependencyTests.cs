@@ -22,43 +22,43 @@ public sealed class DependencyTests
     // ── Assembly anchors ──────────────────────────────────────────────────────
     // One public type from each layer is enough to resolve the assembly at test-time.
 
-    private static readonly Assembly DomainAssembly =
+    private static readonly Assembly _domainAssembly =
         typeof(Assessment).Assembly;                                 // Domain
 
-    private static readonly Assembly ApplicationAssembly =
+    private static readonly Assembly _applicationAssembly =
         typeof(IApplicationAssemblyMarker).Assembly;                 // Application
 
-    private static readonly Assembly InfrastructureAssembly =
+    private static readonly Assembly _infrastructureAssembly =
         typeof(InfrastructureServiceCollectionExtensions).Assembly;  // Infrastructure
 
-    private static readonly Assembly ApiAssembly =
+    private static readonly Assembly _apiAssembly =
         typeof(Program).Assembly;                                    // Api
 
     // ── Namespace prefix constants ────────────────────────────────────────────
 
-    private const string DomainNs         = "EdTech.SheetIntegrator.Domain";
-    private const string ApplicationNs    = "EdTech.SheetIntegrator.Application";
-    private const string InfrastructureNs = "EdTech.SheetIntegrator.Infrastructure";
-    private const string ApiNs            = "EdTech.SheetIntegrator.Api";
+    private const string _domainNs = "EdTech.SheetIntegrator.Domain";
+    private const string _applicationNs = "EdTech.SheetIntegrator.Application";
+    private const string _infrastructureNs = "EdTech.SheetIntegrator.Infrastructure";
+    private const string _apiNs = "EdTech.SheetIntegrator.Api";
 
     // ── Domain — depends on nothing ───────────────────────────────────────────
 
     [Fact]
     public void Domain_Does_Not_Depend_On_Application()
     {
-        AssertNoDependency(DomainAssembly, ApplicationNs);
+        AssertNoDependency(_domainAssembly, _applicationNs);
     }
 
     [Fact]
     public void Domain_Does_Not_Depend_On_Infrastructure()
     {
-        AssertNoDependency(DomainAssembly, InfrastructureNs);
+        AssertNoDependency(_domainAssembly, _infrastructureNs);
     }
 
     [Fact]
     public void Domain_Does_Not_Depend_On_Api()
     {
-        AssertNoDependency(DomainAssembly, ApiNs);
+        AssertNoDependency(_domainAssembly, _apiNs);
     }
 
     // ── Application — depends on Domain only ──────────────────────────────────
@@ -66,13 +66,13 @@ public sealed class DependencyTests
     [Fact]
     public void Application_Does_Not_Depend_On_Infrastructure()
     {
-        AssertNoDependency(ApplicationAssembly, InfrastructureNs);
+        AssertNoDependency(_applicationAssembly, _infrastructureNs);
     }
 
     [Fact]
     public void Application_Does_Not_Depend_On_Api()
     {
-        AssertNoDependency(ApplicationAssembly, ApiNs);
+        AssertNoDependency(_applicationAssembly, _apiNs);
     }
 
     // ── Infrastructure — depends on Application + Domain ─────────────────────
@@ -80,7 +80,7 @@ public sealed class DependencyTests
     [Fact]
     public void Infrastructure_Does_Not_Depend_On_Api()
     {
-        AssertNoDependency(InfrastructureAssembly, ApiNs);
+        AssertNoDependency(_infrastructureAssembly, _apiNs);
     }
 
     // ── Helper ────────────────────────────────────────────────────────────────

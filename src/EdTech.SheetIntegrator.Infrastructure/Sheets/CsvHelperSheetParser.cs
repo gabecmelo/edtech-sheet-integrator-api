@@ -11,9 +11,9 @@ namespace EdTech.SheetIntegrator.Infrastructure.Sheets;
 /// </summary>
 internal sealed class CsvHelperSheetParser : ISheetParser
 {
-    private const string CsvExtension = ".csv";
+    private const string _csvExtension = ".csv";
 
-    private static readonly HashSet<string> CsvContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> _csvContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "text/csv",
         "application/csv",
@@ -23,12 +23,12 @@ internal sealed class CsvHelperSheetParser : ISheetParser
     public bool CanParse(string fileName, string? contentType)
     {
         if (!string.IsNullOrEmpty(fileName) &&
-            Path.GetExtension(fileName).Equals(CsvExtension, StringComparison.OrdinalIgnoreCase))
+            Path.GetExtension(fileName).Equals(_csvExtension, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
 
-        return contentType is not null && CsvContentTypes.Contains(contentType);
+        return contentType is not null && _csvContentTypes.Contains(contentType);
     }
 
     public async Task<IReadOnlyList<RawAnswer>> ParseAsync(Stream stream, CancellationToken cancellationToken)

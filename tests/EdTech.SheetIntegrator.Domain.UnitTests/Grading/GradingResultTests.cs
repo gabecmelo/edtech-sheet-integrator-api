@@ -6,14 +6,14 @@ namespace EdTech.SheetIntegrator.Domain.UnitTests.Grading;
 
 public class GradingResultTests
 {
-    private static readonly QuestionOutcome Q1Correct = new("Q1", true, 1m, 1m);
-    private static readonly QuestionOutcome Q2Wrong = new("Q2", false, 0m, 2m);
+    private static readonly QuestionOutcome _q1Correct = new("Q1", true, 1m, 1m);
+    private static readonly QuestionOutcome _q2Wrong = new("Q2", false, 0m, 2m);
 
     [Fact]
     public void Constructor_Sets_Properties_When_Sums_Are_Consistent()
     {
         var score = new Score(1m, 3m);
-        var outcomes = new[] { Q1Correct, Q2Wrong };
+        var outcomes = new[] { _q1Correct, _q2Wrong };
 
         var result = new GradingResult(score, outcomes, Fixtures.Now);
 
@@ -36,7 +36,7 @@ public class GradingResultTests
         // Outcomes total = 1 + 2 = 3, but Score.Total = 5
         var act = () => new GradingResult(
             new Score(1m, 5m),
-            [Q1Correct, Q2Wrong],
+            [_q1Correct, _q2Wrong],
             Fixtures.Now);
 
         act.Should().Throw<DomainException>().WithMessage("*max points*total*");
@@ -48,7 +48,7 @@ public class GradingResultTests
         // Outcomes earned = 1, but Score.Earned = 0
         var act = () => new GradingResult(
             new Score(0m, 3m),
-            [Q1Correct, Q2Wrong],
+            [_q1Correct, _q2Wrong],
             Fixtures.Now);
 
         act.Should().Throw<DomainException>().WithMessage("*earned points*");
