@@ -1,0 +1,80 @@
+# Local development stack: SQL Server 2022 + EdTech Sheet-Integrator API.
+#
+# Prerequisites:
+#   1. Copy .env.example to .env and fill in the secrets.
+#   2. docker compose up -d
+#   3. Wait for the `mssql` service to be healthy, then apply migrations:
+#        docker compose exec api dotnet EdTech.SheetIntegrator.Api.dll  (starts automatically)
+#        dotnet ef database update --project src/EdTech.SheetIntegrator.Infrastructure
+#   4. OpenAPI UI: http://localhost:8080/docs
+
+services:
+
+  # ── SQL Server 2022 ────────────────────────────────────────────────────────
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "${SA_PASSWORD:?SA_PASSWORD must be set in .env}"
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      # sqlcmd is bundled in the SQL Server image; -No trusts the self-signed cert.
+      test:
+        - "CMD-SHELL"
+        - >
+          /opt/mssql-tools18/bin/sqlcmd
+          -S localhost -U sa -P "$$SA_PASSWORD"
+          -Q "SELECT 1" -No -l 5
+          || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # ── API ────────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+
+      # Connection string — uses the compose service name as the host.
+      ConnectionStrings__Default: >-
+        Server=mssql,1433;
+        Database=EdTechSheetIntegrator;
+        User Id=sa;
+        Password=${SA_PASSWORD:?SA_PASSWORD must be set in .env};
+        TrustServerCertificate=True;
+        Connection Timeout=30;
+
+      # JWT — use a strong random key in production (min 32 chars).
+      Jwt__Issuer: edtech
+      Jwt__Audience: edtech-api
+      Jwt__SigningKey: "${JWT_SIGNING_KEY:?JWT_SIGNING_KEY must be set in .env}"
+      Jwt__TokenLifetimeMinutes: "60"
+
+      # Serilog — structured JSON to stdout (collected by Docker logging driver).
+      Serilog__MinimumLevel__Default: Information
+      Serilog__WriteTo__0__Name: Console
+      Serilog__WriteTo__0__Args__formatter: Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact
+
+      # Upload size cap (bytes) — 10 MB default.
+      Upload__MaxFileSizeBytes: "10485760"
+
+    ports:
+      - "8080:8080"
+    depends_on:
+      mssql:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mssql-data:

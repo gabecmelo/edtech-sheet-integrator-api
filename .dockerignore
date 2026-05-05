@@ -18,3 +18,7 @@
 **/.env
 **/.env.*
 artifacts/
+# Test projects — never needed in the production image
+tests/
+docs/
+.config/
