@@ -1,0 +1,187 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Cancel in-progress runs for the same ref so stale PR runs don't block resources.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+jobs:
+
+  # ── 1. Format ───────────────────────────────────────────────────────────────
+  format:
+    name: Format check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore (required by format analyser)
+        run: dotnet restore EdTech.SheetIntegrator.sln
+
+      - name: Verify formatting
+        run: dotnet format EdTech.SheetIntegrator.sln --verify-no-changes
+
+  # ── 2. Build & unit tests ───────────────────────────────────────────────────
+  build-test:
+    name: Build & unit tests
+    runs-on: ubuntu-latest
+    needs: format
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - run: dotnet restore EdTech.SheetIntegrator.sln
+
+      - name: Build (warnings-as-errors)
+        run: dotnet build EdTech.SheetIntegrator.sln --no-restore -warnaserror
+
+      - name: Run unit + architecture tests
+        # Filter excludes both Infrastructure.IntegrationTests and Api.IntegrationTests
+        # — those require Docker and run in the dedicated integration-test job.
+        run: |
+          dotnet test EdTech.SheetIntegrator.sln \
+            --no-build \
+            --filter "FullyQualifiedName!~IntegrationTests" \
+            --collect:"XPlat Code Coverage" \
+            --results-directory TestResults \
+            --logger "trx;LogFileName=results.trx"
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: TestResults/**/coverage.cobertura.xml
+
+  # ── 3. Integration tests ────────────────────────────────────────────────────
+  integration-test:
+    name: Integration tests
+    runs-on: ubuntu-latest   # Docker is available on ubuntu-latest runners
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - run: dotnet restore EdTech.SheetIntegrator.sln
+
+      - name: Build
+        run: dotnet build EdTech.SheetIntegrator.sln --no-restore -warnaserror
+
+      - name: Infrastructure integration tests (Testcontainers SQL Server)
+        run: |
+          dotnet test tests/EdTech.SheetIntegrator.Infrastructure.IntegrationTests/ \
+            --no-build \
+            --logger "trx;LogFileName=infra-results.trx"
+
+      - name: API integration tests (WebApplicationFactory + Testcontainers)
+        run: |
+          dotnet test tests/EdTech.SheetIntegrator.Api.IntegrationTests/ \
+            --no-build \
+            --logger "trx;LogFileName=api-results.trx"
+
+  # ── 4. Mutation tests ────────────────────────────────────────────────────────
+  # Runs Stryker.NET against Domain and Application in parallel matrix entries.
+  mutation:
+    name: Mutation — ${{ matrix.project.name }}
+    runs-on: ubuntu-latest
+    needs: build-test
+    strategy:
+      fail-fast: false          # Let both matrix legs finish even if one fails
+      matrix:
+        project:
+          - name: Domain
+            csproj: EdTech.SheetIntegrator.Domain.csproj
+          - name: Application
+            csproj: EdTech.SheetIntegrator.Application.csproj
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - run: dotnet restore EdTech.SheetIntegrator.sln
+
+      - name: Restore local tools (dotnet-stryker)
+        run: dotnet tool restore
+
+      - name: Locate MSBuild.dll
+        id: msbuild
+        run: |
+          SDK_BASE=$(dotnet --info | grep -i "Base Path" | awk '{print $NF}')
+          echo "path=${SDK_BASE}MSBuild.dll" >> "$GITHUB_OUTPUT"
+
+      - name: Run Stryker (${{ matrix.project.name }})
+        run: |
+          dotnet stryker \
+            --project "${{ matrix.project.csproj }}" \
+            --msbuild-path "${{ steps.msbuild.outputs.path }}"
+
+      - name: Upload mutation report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stryker-${{ matrix.project.name }}
+          path: StrykerOutput/**/reports/mutation-report.html
+
+  # ── 5. Docker build ──────────────────────────────────────────────────────────
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: edtech-sheet-integrator:${{ github.sha }}
+          # GHA layer cache avoids re-downloading the SDK and runtime base images.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
